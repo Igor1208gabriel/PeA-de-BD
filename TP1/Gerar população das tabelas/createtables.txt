@@ -1,0 +1,65 @@
+DROP SCHEMA sistema CASCADE;
+
+CREATE SCHEMA sistema;
+
+CREATE TABLE sistema.clientes (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    telefone VARCHAR(20),
+    data_cadastro DATE NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE sistema.enderecos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    rua VARCHAR(100) NOT NULL,
+    cidade VARCHAR(50) NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    cep VARCHAR(10) NOT NULL,
+    FOREIGN KEY(cliente_id) REFERENCES sistema.clientes(id)
+);
+
+CREATE TABLE sistema.vendedores (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    telefone VARCHAR(20)
+);
+
+CREATE TABLE sistema.formas_pagamento (
+    id SERIAL PRIMARY KEY, 
+    descricao VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE sistema.pedidos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    vendedor_id INT NOT NULL,
+    data_pedido DATE NOT NULL DEFAULT CURRENT_DATE,
+    endereco_entrega_id INT NOT NULL,
+    forma_pagamento_id INT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (cliente_id) REFERENCES sistema.clientes(id),
+    FOREIGN KEY (vendedor_id) REFERENCES sistema.vendedores(id),
+    FOREIGN KEY (endereco_entrega_id) REFERENCES sistema.enderecos(id),
+    FOREIGN KEY (forma_pagamento_id) REFERENCES sistema.formas_pagamento(id)
+);
+
+CREATE TABLE sistema.itens (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco DECIMAL(10,2) NOT NULL,
+    estoque INT NOT NULL
+);
+
+CREATE TABLE sistema.itens_pedido (
+    id SERIAL PRIMARY KEY,
+    pedido_id INT NOT NULL,
+    item_id INT NOT NULL,
+    quantidade INT NOT NULL,
+    preco_unitario DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (pedido_id) REFERENCES sistema.pedidos(id),
+    FOREIGN KEY (item_id) REFERENCES sistema.itens(id)
+);
